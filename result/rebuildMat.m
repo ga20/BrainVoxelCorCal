@@ -3,9 +3,9 @@
 
 
 % load the out put 1-d array 
-load('res.mat');
+load('res_test.mat');
 % load your mask matrix
-load('D:\mycode\体素分析\MyAp\Mask\mask.mat');
+load('D:\mycode\体素分析\MyAp\Mask\testmask.mat');
 % voxel dimension is same with mask
 z = size(mask, 1);
 y = size(mask, 2);

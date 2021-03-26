@@ -12,6 +12,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.ThreadPoolExecutor;
 
+/**
+ *
+ * @Description This is core multi-thread class
+ **/
 public class MultiThreadsCal {
 
     private String maskPath ;
@@ -19,6 +23,7 @@ public class MultiThreadsCal {
     private List<Node> nodeCollection;
     // valid voxel element in deed
     private int amount;
+    // correlation matrix
     private float[] dp ;
     // dp array capacity
     private int dpactualamout;
@@ -33,8 +38,11 @@ public class MultiThreadsCal {
         this.filePath = filePath;
     }
 
+    /**
+     * task class
+     */
     class CalThread implements Runnable {
-        private final String name;
+        private String name;
         private final int numofNode;
         private CountDownLatch countDownLatch;
 
@@ -48,20 +56,21 @@ public class MultiThreadsCal {
             Node cur = nodeCollection.get(numofNode);
             double sumScore = 0;
             try{
+                // current node correlate with other node
                 for(int i = 0 ; i < amount ; ++i){
                     // i correlate i = 1
                     if(i == numofNode){
                         sumScore += 1;
                         continue;
                     }
-
+                    // current index is out of the correlation matrix(dp), calculate directly
                     if(numofNode >= dpactualamout || i >= dpactualamout){
                         float score = PearsonCorrelation.getPearsonCorrelationScore(cur.timeSeries, nodeCollection.get(i).timeSeries);
                         sumScore += score;
                         continue;
                     }
 
-                    // get dp address of numofNode and target node
+                    // get dp address of numofNode and target node in dp
                     int k = getIndexOfDp(numofNode + 1, i + 1);
                     if(dp[k] != 0){
                         sumScore += dp[k];
@@ -71,14 +80,16 @@ public class MultiThreadsCal {
                     float score = PearsonCorrelation.getPearsonCorrelationScore(cur.timeSeries, nodeCollection.get(i).timeSeries);
                     sumScore += score;
                     if(dp[k] == 0) {
+                        // lock when thread write dp
                         synchronized (dp){
                             dp[k] = score;
                         }
                     }
                 }
                 cur.meanCorrelationScore = (float) sumScore / amount;
+                // countDownLatch-- when task finished
                 countDownLatch.countDown();
-               System.out.println(String.format("( %d / %d )", numofNode, amount));
+               System.out.println(String.format("( %d / %d )", numofNode + 1, amount));
             }catch (Exception e) {
                 System.out.println(numofNode + "error");
                 throw new RuntimeException(e + "computational process exception");
@@ -86,6 +97,11 @@ public class MultiThreadsCal {
         }
     }
 
+    /**
+     * read matrix and calculate
+     * @return 3-d meanCorrelationScore
+     * @throws Exception
+     */
     public float[][][] readAndCal() throws Exception {
         ReadMyMat reader;
         try{
@@ -103,13 +119,19 @@ public class MultiThreadsCal {
 
         // compute length of dp arr
         int dpLength = 0;
-        dpactualamout = amount - 20000;
+        // real dp's length depends on JVM heap space, maybe cause OOM
+        dpactualamout = amount * 4 / 5;
         for(int i = 1; i <= dpactualamout; i++){
             dpLength += i;
         }
 
-
+        /* Due to Correlation matrix is symmetric. So we can store half of the matrix;
+         *  In order to minimize the dp space, here we do matrix compressed storage.
+         *  We store upper triangular matrix, so the real address for correlation(i,j)
+         * equals (i - 1) * (2 * dpactualamout - i + 2) / 2 + j - i + 1.
+         */
         dp = new float[dpLength];
+        // Thread pool
         ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(8);
         CountDownLatch countDownLatch = new CountDownLatch(amount);
         try{
@@ -122,8 +144,10 @@ public class MultiThreadsCal {
             throw new Exception("Exception appeared in process of multiple threads compute ");
         }
 
+        // main thread wait until all tasks finished
         countDownLatch.await();
 
+        Thread.sleep(1000 );
 
         System.out.println("All voxels have been computed");
 
@@ -143,15 +167,13 @@ public class MultiThreadsCal {
 
     }
 
-
-    public float[][][] getRes(){
-        if(result == null){
-            throw new RuntimeException("Please invoke readAndCal to compute result");
-        }
-        return result;
-    }
-
-
+    /**
+     * compute real address in dp
+     *
+     * @param i
+     * @param j
+     * @return real address in dp
+     */
     private int getIndexOfDp(int i, int j){
         // i and j == j and i
         if(i > j){

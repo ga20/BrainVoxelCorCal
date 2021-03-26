@@ -77,8 +77,7 @@ public class PearsonCorrelation {
     }
 
     /**
-     * 生成分母
-     *
+     *  generate Denomiator
      * @param yMeans
      * @param yData
      * @param xMeans
