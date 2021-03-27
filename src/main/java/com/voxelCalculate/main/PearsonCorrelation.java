@@ -22,7 +22,7 @@ public class PearsonCorrelation {
 
     public static float getScore(List<Float> x, List<Float> y) {
         if (x.size() != y.size())
-            throw new RuntimeException("两组数据维度不正确！");
+            throw new RuntimeException("The array dimensions are not the same ！");
         float[] xData = new float[x.size()];
         float[] yData = new float[x.size()];
         for (int i = 0; i < x.size(); i++) {
@@ -34,13 +34,13 @@ public class PearsonCorrelation {
 
     public static float getScore(float[] x, float[] y) {
         if (x.length != y.length)
-            throw new RuntimeException("两组数据维度不正确！");
+            throw new RuntimeException("The array dimensions are not the same ！");
         return getPearsonCorrelationScore(x,y);
     }
 
     public static float getPearsonCorrelationScore(float[] xData, float[] yData) {
         if (xData.length != yData.length)
-            throw new RuntimeException("两组数据维度不正确！");
+            throw new RuntimeException("The array dimensions are not the same ！");
         float xMeans;
         float yMeans;
         float numerator = 0;

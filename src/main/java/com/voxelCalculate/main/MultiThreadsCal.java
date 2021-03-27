@@ -23,7 +23,13 @@ public class MultiThreadsCal {
     private List<Node> nodeCollection;
     // valid voxel element in deed
     private int amount;
-    // correlation matrix
+
+
+    /* Due to Correlation matrix is symmetric. So we can store half of the matrix;
+     *  In order to minimize the dp space, here we do matrix compressed storage.
+     *  We store upper triangular matrix, so the real address for correlation(i,j)
+     * equals (i - 1) * (2 * dpactualamout - i + 2) / 2 + j - i + 1.
+     */
     private float[] dp ;
     // dp array capacity
     private int dpactualamout;
@@ -125,11 +131,7 @@ public class MultiThreadsCal {
             dpLength += i;
         }
 
-        /* Due to Correlation matrix is symmetric. So we can store half of the matrix;
-         *  In order to minimize the dp space, here we do matrix compressed storage.
-         *  We store upper triangular matrix, so the real address for correlation(i,j)
-         * equals (i - 1) * (2 * dpactualamout - i + 2) / 2 + j - i + 1.
-         */
+
         dp = new float[dpLength];
         // Thread pool
         ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(8);
