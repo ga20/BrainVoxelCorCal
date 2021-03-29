@@ -2,7 +2,7 @@ package com.voxelCalculate.main;
 
 import java.util.List;
 /**
- * calculate Pearson Correlation between two groups
+ * Calculate Pearson Correlation between two groups
  */
 public class PearsonCorrelation {
 

@@ -17,6 +17,5 @@ public class testWrite {
             }
         }
         rmt.writeMat(targetpath, a);
-
     }
 }

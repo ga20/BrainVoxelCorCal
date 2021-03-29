@@ -1,19 +1,12 @@
 package com.voxelCalculate.main;
-
-
-import com.sun.org.apache.xml.internal.utils.res.XResources_sv;
-import org.ujmp.core.task.Task;
-import org.ujmp.core.util.R;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
- *
+ * This class provides the multi-thread calculation function.
  * @Description This is core multi-thread class
  **/
 public class MultiThreadsCal {
@@ -25,8 +18,8 @@ public class MultiThreadsCal {
     private int amount;
 
 
-    /* Due to Correlation matrix is symmetric. So we can store half of the matrix;
-     *  In order to minimize the dp space, here we do matrix compressed storage.
+    /** Due to Correlation matrix is symmetric. So we can store half of the matrix;
+     *  In order to minimize the dp space, here we compress matrix storage.
      *  We store upper triangular matrix, so the real address for correlation(i,j)
      * equals (i - 1) * (2 * dpactualamout - i + 2) / 2 + j - i + 1.
      */
@@ -36,12 +29,21 @@ public class MultiThreadsCal {
     public float[][][] result;
 
     public MultiThreadsCal(String maskPath, String filePath) {
-        this.maskPath = maskPath;
-        this.filePath = filePath;
+        try {
+            this.maskPath = maskPath;
+            this.filePath = filePath;
+        } catch (IllegalArgumentException e){
+            e.printStackTrace();
+        }
+
     }
 
     public MultiThreadsCal(String filePath) {
-        this.filePath = filePath;
+        try {
+            this.filePath = filePath;
+        } catch (IllegalArgumentException e){
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -116,9 +118,8 @@ public class MultiThreadsCal {
             }else {
                 reader = new ReadMyMat(maskPath, filePath);
             }
-
-        }catch (Exception e){
-            throw new RuntimeException(e + "\n error in read mask or data file" );
+        }catch (IOException e){
+            throw new IOException(e + "\n error in read mask or data file" );
         }
         nodeCollection = reader.getNodeContent();
         amount = nodeCollection.size();
@@ -177,6 +178,9 @@ public class MultiThreadsCal {
      * @return real address in dp
      */
     private int getIndexOfDp(int i, int j){
+        if(i < 0 || j < 0){
+            throw new IllegalArgumentException("Parameters error");
+        }
         // i and j == j and i
         if(i > j){
             int t = i;
