@@ -30,7 +30,11 @@ public class ReadMyMat {
     private List<Node> nodeContent;
     public int[] shape;
     public int maskValidElementCount;
-
+    /**
+     * varaible name in .mat file
+     */
+    public String maskvaraible = "mask";
+    public String filevaraible = "myniidata";
     /**
      *
      * @Description Constructor
@@ -56,7 +60,7 @@ public class ReadMyMat {
     public float[][][][] readMat(String filePath) throws IOException {
 
         MatFileReader read = new MatFileReader(filePath);
-        MLArray mlArray = read.getMLArray("myniidata");
+        MLArray mlArray = read.getMLArray(filevaraible);
         shape = mlArray.getDimensions();
         int sizex = shape[0];
         int sizey = shape[1];
@@ -93,7 +97,7 @@ public class ReadMyMat {
 
         MatFileReader read = new MatFileReader(maskPath);
         // parameter "name" is variable name in .mat file
-        MLArray mlArray = read.getMLArray("mask");
+        MLArray mlArray = read.getMLArray(maskvaraible);
         int sizex = mlArray.getDimensions()[0];
         int sizey = mlArray.getDimensions()[1];
         int sizez = mlArray.getDimensions()[2];

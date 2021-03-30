@@ -23,7 +23,7 @@ public class MultiThreadsCal {
      *  We store upper triangular matrix, so the real address for correlation(i,j)
      * equals (i - 1) * (2 * dpactualamout - i + 2) / 2 + j - i + 1.
      */
-    private float[] dp ;
+    private volatile float[] dp ;
     // dp array capacity
     private int dpactualamout;
     public float[][][] result;
