@@ -228,7 +228,7 @@ public class ReadMyMat {
 
 /**
  *
- * @Description voxel node
+ * @Description voxel node, it contains location, time series and mean correlation score of each node.
  **/
 class Node{
     public int x;

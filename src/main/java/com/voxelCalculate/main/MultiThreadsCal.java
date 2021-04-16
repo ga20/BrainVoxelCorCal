@@ -6,8 +6,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
- * This class provides the multi-thread calculation function.
- * @Description This is core multi-thread class
+ *
+ * @Description This class provides the multi-thread calculation function and it is core multi-thread class.
  **/
 public class MultiThreadsCal {
 
@@ -18,8 +18,8 @@ public class MultiThreadsCal {
     private int amount;
 
 
-    /** Due to Correlation matrix is symmetric. So we can store half of the matrix;
-     *  In order to minimize the dp space, here we compress matrix storage.
+    /** Due to Correlation matrix is symmetric. So we can store half of the matrix.
+     *  In order to minimize the dp array size, here we compress matrix storage.
      *  We store upper triangular matrix, so the real address for correlation(i,j)
      * equals (i - 1) * (2 * dpactualamout - i + 2) / 2 + j - i + 1.
      */
